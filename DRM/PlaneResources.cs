@@ -1,5 +1,5 @@
 ﻿//
-// TTY.cs
+// PlaneResources.cs
 //
 // Author:
 //       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
@@ -26,19 +26,52 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Crow.Linux.VT
+namespace DRI.DRM
 {
-	internal class TTY  {
-		[DllImport("libc")]
-		static extern IntPtr ptsname(int fd);
-		[DllImport("libc")]
-		public static extern int unlockpt(int fd);
+	[StructLayout(LayoutKind.Sequential)]
+	unsafe internal struct drmPlaneRes {
+		public uint count_planes;
+		public uint *planes;
+	}
 
-		public static string GetFreePtsPath (int fd){
-			IntPtr pStr = ptsname (fd);
-			string name = Marshal.PtrToStringAnsi (pStr);
-			return name;
+	unsafe public class PlaneResources : IDisposable
+	{
+		#region pinvoke
+		[DllImport("libdrm", CallingConvention = CallingConvention.Cdecl)]
+		unsafe internal static extern drmPlaneRes* drmModeGetPlaneResources(int fd);
+		[DllImport("libdrm", CallingConvention = CallingConvention.Cdecl)]
+		unsafe internal static extern void drmModeFreePlaneResources(drmPlaneRes* ptr);
+		#endregion
+
+		int gpu_fd;
+		drmPlaneRes* handle;
+
+		internal PlaneResources (int fd_gpu)
+		{
+			gpu_fd = fd_gpu;
+			handle = drmModeGetPlaneResources (fd_gpu);
+
+			if (handle == null)
+				throw new NotSupportedException("[DRI] drmModeGetPlaneResources failed.");
 		}
+
+		#region IDisposable implementation
+		~PlaneResources(){
+			Dispose (false);
+		}
+		public void Dispose ()
+		{
+			Dispose (true);
+			GC.SuppressFinalize (this);
+		}
+		protected virtual void Dispose (bool disposing){
+			unsafe {
+				if (handle != null)
+					drmModeFreePlaneResources (handle);
+				handle = null;
+			}
+		}
+		#endregion
 	}
 }
 

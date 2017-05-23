@@ -28,7 +28,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace DRI
+namespace DRI.DRM
 {
 	#region Enums
 	public enum ConnectionStatus

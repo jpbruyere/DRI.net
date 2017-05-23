@@ -26,7 +26,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace GBM
+namespace DRI.GBM
 {
 	unsafe public class Device : IDisposable
 	{

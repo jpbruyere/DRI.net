@@ -27,14 +27,6 @@
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Compile Include="TTY.cs" />
-    <Compile Include="VT.cs" />
-    <Compile Include="DRI\Connector.cs" />
-    <Compile Include="DRI\Crtc.cs" />
-    <Compile Include="DRI\Encoder.cs" />
-    <Compile Include="DRI\Plane.cs" />
-    <Compile Include="DRI\PlaneResources.cs" />
-    <Compile Include="DRI\Resources.cs" />
     <Compile Include="GBM\BufferObject.cs" />
     <Compile Include="GBM\Device.cs" />
     <Compile Include="GBM\Surface.cs" />
@@ -43,7 +35,13 @@
     <Compile Include="EGL\EGL.cs" />
     <Compile Include="EGL\Surface.cs" />
     <Compile Include="Poll.cs" />
-    <Compile Include="DRI\Native.cs" />
+    <Compile Include="DRM\Connector.cs" />
+    <Compile Include="DRM\Crtc.cs" />
+    <Compile Include="DRM\Encoder.cs" />
+    <Compile Include="DRM\Plane.cs" />
+    <Compile Include="DRM\PlaneResources.cs" />
+    <Compile Include="DRM\Resources.cs" />
+    <Compile Include="DRM\Native.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System" />

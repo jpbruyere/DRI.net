@@ -328,7 +328,7 @@ namespace EGL
 		public string OffScreenExtensions { get { return Marshal.PtrToStringAuto (QueryString (IntPtr.Zero, Egl.EXTENSIONS)); }}	
 
 		#region ctor
-		public Context (GBM.Device gbmDev)
+		public Context (DRI.GBM.Device gbmDev)
 		{
 			dpy = GetDisplay(gbmDev.handle);
 

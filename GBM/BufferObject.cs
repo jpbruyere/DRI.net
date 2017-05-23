@@ -26,10 +26,10 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace GBM 
+namespace DRI.GBM 
 {
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-	public delegate void DestroyUserDataCallback(ref GBM.gbm_bo bo, ref uint data);
+	public delegate void DestroyUserDataCallback(ref DRI.GBM.gbm_bo bo, ref uint data);
 
 	[StructLayout(LayoutKind.Sequential)]
 	public struct gbm_bo {

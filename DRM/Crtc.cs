@@ -1,9 +1,11 @@
 ﻿//
-// PlaneResources.cs
+// Crtc.cs
 //
 // Author:
+//		 Stefanos Apostolopoulos <stapostol@gmail.com>
 //       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
 //
+// Copyright (c) 2006-2014 Stefanos Apostolopoulos
 // Copyright (c) 2013-2017 Jean-Philippe Bruyère
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,37 +28,57 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace DRI
+namespace DRI.DRM 
 {
 	[StructLayout(LayoutKind.Sequential)]
-	unsafe internal struct drmPlaneRes {
-		public uint count_planes;
-		public uint *planes;
+	internal struct drmCrtc
+	{
+		public uint crtc_id;
+		public uint buffer_id;
+
+		public uint x, y;
+		public uint width, height;
+		public int mode_valid;
+		public ModeInfo mode;
+
+		public int gamma_size;
 	}
 
-	unsafe public class PlaneResources : IDisposable
+	unsafe public class Crtc : IDisposable
 	{
 		#region pinvoke
 		[DllImport("libdrm", CallingConvention = CallingConvention.Cdecl)]
-		unsafe internal static extern drmPlaneRes* drmModeGetPlaneResources(int fd);
+		internal static extern drmCrtc* drmModeGetCrtc(int fd, uint crtcId);
 		[DllImport("libdrm", CallingConvention = CallingConvention.Cdecl)]
-		unsafe internal static extern void drmModeFreePlaneResources(drmPlaneRes* ptr);
+		internal static extern void drmModeFreeCrtc(drmCrtc* ptr);
 		#endregion
 
-		int gpu_fd;
-		drmPlaneRes* handle;
+		int fd_gpu;
+		internal drmCrtc* handle;
 
-		internal PlaneResources (int fd_gpu)
+		#region ctor
+		internal Crtc (int _fd_gpu, uint _id)
 		{
-			gpu_fd = fd_gpu;
-			handle = drmModeGetPlaneResources (fd_gpu);
+			fd_gpu = _fd_gpu;
+			handle = drmModeGetCrtc (fd_gpu, _id);
 
 			if (handle == null)
-				throw new NotSupportedException("[DRI] drmModeGetPlaneResources failed.");
+				throw new NotSupportedException("[DRI] drmModeGetCrtc failed.");
 		}
+		#endregion
+
+		public uint Id { get { return handle->crtc_id; }}
+		public ModeInfo CurrentMode { get { return handle->mode; }}
+		public uint CurrentFbId { get { return handle->buffer_id; }}
+		public bool ModeIsValid { get { return handle->mode_valid == 0 ? false : true; }}
+		public uint X { get { return handle->x; }}
+		public uint Y { get { return handle->x; }}
+		public uint Height { get { return handle->height; }}
+		public uint Width { get { return handle->width; }}
+		public int GammaSize { get { return handle->gamma_size; }}
 
 		#region IDisposable implementation
-		~PlaneResources(){
+		~Crtc(){
 			Dispose (false);
 		}
 		public void Dispose ()
@@ -67,11 +89,16 @@ namespace DRI
 		protected virtual void Dispose (bool disposing){
 			unsafe {
 				if (handle != null)
-					drmModeFreePlaneResources (handle);
+					drmModeFreeCrtc (handle);
 				handle = null;
 			}
 		}
 		#endregion
+
+		public override string ToString ()
+		{
+			return string.Format ("[Crtc: Id={0}, CurrentMode={1}, CurrentFbId={2}, ModeIsValid={3}, X={4}, Y={5}, Height={6}, Width={7}, GammaSize={8}]", Id, CurrentMode, CurrentFbId, ModeIsValid, X, Y, Height, Width, GammaSize);
+		}
 	}
 }
 

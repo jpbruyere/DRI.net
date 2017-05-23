@@ -26,7 +26,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace DRI
+namespace DRI.DRM
 {
 	public enum PlaneType {
 		Overlay = 0,

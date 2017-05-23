@@ -2,8 +2,10 @@
 // DRM.cs
 //
 // Author:
+//		 Stefanos Apostolopoulos <stapostol@gmail.com>
 //       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
 //
+// Copyright (c) 2006-2014 Stefanos Apostolopoulos
 // Copyright (c) 2013-2017 Jean-Philippe Bruyère
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -25,11 +27,9 @@
 // THE SOFTWARE.
 using System;
 using System.Runtime.InteropServices;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading;
 
-namespace DRI {
+
+namespace DRI.DRM {
 	#region DRM callback signatures
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	public delegate void VBlankCallback(int fd, int sequence, int tv_sec, int tv_usec, IntPtr user_data);
@@ -38,18 +38,7 @@ namespace DRI {
 	#endregion
 
 	#region DRM enums
-	public enum EncoderType : uint
-	{
-		NONE=0,
-		DAC=1,
-		TMDS=2,
-		LVDS=3,
-		TVDAC=4,
-		VIRTUAL=5,
-		DSI=6,
-		DPMST=7,
-		DPI=8,
-	}
+
 	[Flags]public enum PageFlipFlags : uint
 	{
 		FlipEvent = 0x01,

@@ -72,7 +72,7 @@ namespace EGL
 			if (handle == IntPtr.Zero)
 				throw new NotSupportedException(String.Format("[EGL] Failed to create surface, error {0}.", EGL.Context.GetError()));			
 		}
-		public Surface (Context _ctx, GBM.Surface gbmSurf)
+		public Surface (Context _ctx, DRI.GBM.Surface gbmSurf)
 		{
 			ctx = _ctx;
 			handle = eglCreateWindowSurface(ctx.dpy, ctx.currentCfg, gbmSurf.handle, IntPtr.Zero);

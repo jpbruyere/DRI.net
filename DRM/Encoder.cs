@@ -1,9 +1,11 @@
 ﻿//
-// Resources.cs
+// Encoder.cs
 //
 // Author:
+//		 Stefanos Apostolopoulos <stapostol@gmail.com>
 //       Jean-Philippe Bruyère <jp.bruyere@hotmail.com>
 //
+// Copyright (c) 2006-2014 Stefanos Apostolopoulos
 // Copyright (c) 2013-2017 Jean-Philippe Bruyère
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -26,78 +28,67 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace DRI
+namespace DRI.DRM 
 {
-	[StructLayout(LayoutKind.Sequential)]
-	unsafe internal struct drmResources
+	public enum EncoderType : uint
 	{
-		public int count_fbs;
-		public uint* fbs;
-		public int count_crtcs;
-		public uint* crtcs;
-		public int count_connectors;
-		public uint* connectors;
-		public int count_encoders;
-		public uint* encoders;
-		public uint min_width, max_width;
-		public uint min_height, max_height;
+		NONE=0,
+		DAC=1,
+		TMDS=2,
+		LVDS=3,
+		TVDAC=4,
+		VIRTUAL=5,
+		DSI=6,
+		DPMST=7,
+		DPI=8,
 	}
 
-	unsafe public class Resources: IDisposable
+	[StructLayout(LayoutKind.Sequential)]
+	public struct drmEncoder
+	{
+		public uint encoder_id;
+		public EncoderType encoder_type;
+		public uint crtc_id;
+		public uint possible_crtcs;
+		public uint possible_clones;
+	}
+
+	unsafe public class Encoder : IDisposable
 	{
 		#region pinvoke
 		[DllImport("libdrm", CallingConvention = CallingConvention.Cdecl)]
-		internal static extern drmResources* drmModeGetResources(int fd);
+		internal static extern drmEncoder* drmModeGetEncoder(int fd, uint encoder_id);
 		[DllImport("libdrm", CallingConvention = CallingConvention.Cdecl)]
-		internal static extern void drmModeFreeResources(drmResources* ptr);
+		internal static extern void drmModeFreeEncoder(drmEncoder* ptr);
 		#endregion
 
-		int gpu_fd;
-		drmResources* handle;
-			
+		int fd_gpu;
+		internal drmEncoder* handle;
+
 		#region ctor
-		public Resources (int fd_gpu)
+		unsafe internal Encoder (int _fd_gpu, uint _id)
 		{
-			gpu_fd = fd_gpu;
-			handle = drmModeGetResources (fd_gpu);
+			fd_gpu = _fd_gpu;
+			handle = drmModeGetEncoder (fd_gpu, _id);
 
 			if (handle == null)
-				throw new NotSupportedException("[DRI] drmModeGetResources failed.");
+				throw new NotSupportedException("[DRI] drmModeGetEncoder failed.");
 		}
 		#endregion
+			
+		public uint Id { get { return handle->encoder_id; }}
+		public EncoderType Type { get { return handle->encoder_type; }}
+		public uint PossibleCrtcs { get { return handle->possible_crtcs; }}
+		public uint PossibleClones { get { return handle->possible_clones; }}
 
-		public uint min_width { get { return handle->min_width; }}
-		public uint max_width { get { return handle->max_width; }}
-		public uint min_height { get { return handle->min_height; }}
-		public uint max_height { get { return handle->max_height; }}
-
-		public Connector[] Connectors {
+		public Crtc CurrentCrtc {
 			get {
-				Connector[] tmp = new Connector[handle->count_connectors];
-				for (int i = 0; i < handle->count_connectors; i++)
-					tmp [i] = new Connector (gpu_fd, *(handle->connectors + i));
-				return tmp;
-			}
-		}
-		public Encoder[] Encoders {
-			get {
-				Encoder[] tmp = new Encoder[handle->count_encoders];
-				for (int i = 0; i < handle->count_encoders; i++)
-					tmp [i] = new Encoder (gpu_fd, *(handle->encoders + i));
-				return tmp;
-			}
-		}
-		public Crtc[] Crtcs {
-			get {
-				Crtc[] tmp = new Crtc[handle->count_encoders];
-				for (int i = 0; i < handle->count_crtcs; i++)
-					tmp [i] = new Crtc (gpu_fd, *(handle->crtcs + i));
-				return tmp;
+				return handle->crtc_id == 0 ? null : new Crtc (fd_gpu, handle->crtc_id);
 			}
 		}
 
 		#region IDisposable implementation
-		~Resources(){
+		~Encoder(){
 			Dispose (false);
 		}
 		public void Dispose ()
@@ -106,12 +97,18 @@ namespace DRI
 			GC.SuppressFinalize (this);
 		}
 		protected virtual void Dispose (bool disposing){
-			if (handle != null)
-				drmModeFreeResources (handle);
-			handle = null;
+			unsafe {
+				if (handle != null)
+					drmModeFreeEncoder (handle);
+				handle = null;
+			}
 		}
 		#endregion
 
+		public override string ToString ()
+		{
+			return string.Format ("[Encoder: Id={0}, Type={1}, PossibleCrtcs={2}, PossibleClones={3}]", Id, Type, PossibleCrtcs, PossibleClones);
+		}
 	}
 }
 
