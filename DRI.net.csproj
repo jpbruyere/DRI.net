@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0189EAEF-DCD4-42F8-A83A-2DEA82926671}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>DRI</RootNamespace>
+    <AssemblyName>DRI.net</AssemblyName>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <Description>Linux Direct Rendering Infrastructure Bindings</Description>
+    <OutputPath>$(SolutionDir)build\$(Configuration)</OutputPath>
+    <IntermediateOutputPath>$(SolutionDir)build\obj\$(Configuration)</IntermediateOutputPath>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Compile Include="TTY.cs" />
+    <Compile Include="VT.cs" />
+    <Compile Include="DRI\Connector.cs" />
+    <Compile Include="DRI\Crtc.cs" />
+    <Compile Include="DRI\Encoder.cs" />
+    <Compile Include="DRI\Plane.cs" />
+    <Compile Include="DRI\PlaneResources.cs" />
+    <Compile Include="DRI\Resources.cs" />
+    <Compile Include="GBM\BufferObject.cs" />
+    <Compile Include="GBM\Device.cs" />
+    <Compile Include="GBM\Surface.cs" />
+    <Compile Include="Libc.cs" />
+    <Compile Include="EGL\Context.cs" />
+    <Compile Include="EGL\EGL.cs" />
+    <Compile Include="EGL\Surface.cs" />
+    <Compile Include="Poll.cs" />
+    <Compile Include="DRI\Native.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="EGL\" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,12 @@
+DRI.net
+=======
+
+Linux Direct Rendering Infrastructure Bindings for C#.
+
+It includes bindings for creating accelerated graphical context without X with:
+- DRM/KMS
+- GBM
+- EGL
+
+I've partially reused job done by OpenTK team.
+
